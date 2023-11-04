@@ -80,18 +80,19 @@ export type Transform = {
   actionPerformed: boolean;
 };
 
-export type TEvent<E extends Event = TPointerEvent> = {
+export interface TEvent<E extends Event = TPointerEvent> {
   e: E;
-};
+}
 
-type TEventWithTarget<E extends Event = TPointerEvent> = TEvent<E> & {
+interface TEventWithTarget<E extends Event = TPointerEvent> extends TEvent<E> {
   target: FabricObject;
-};
+}
 
-export type BasicTransformEvent<E extends Event = TPointerEvent> = TEvent<E> & {
+export interface BasicTransformEvent<E extends Event = TPointerEvent>
+  extends TEvent<E> {
   transform: Transform;
   pointer: Point;
-};
+}
 
 export type TModificationEvents =
   | 'moving'
@@ -100,11 +101,12 @@ export type TModificationEvents =
   | 'skewing'
   | 'resizing';
 
-export type ModifiedEvent<E extends Event = TPointerEvent> = TEvent<E> & {
+export interface ModifiedEvent<E extends Event = TPointerEvent>
+  extends TEvent<E> {
   transform: Transform;
   target: FabricObject;
   action: string;
-};
+}
 
 type ModificationEventsSpec<
   Prefix extends string = '',
@@ -123,42 +125,66 @@ type CanvasModificationEvents = ModificationEventsSpec<
   'before:transform': TEvent & { transform: Transform };
 };
 
-export type TPointerEventInfo<E extends TPointerEvent = TPointerEvent> =
-  TEvent<E> & {
-    target?: FabricObject;
-    subTargets?: FabricObject[];
-    button?: number;
-    isClick: boolean;
-    pointer: Point;
-    transform?: Transform | null;
-    absolutePointer: Point;
-    currentSubTargets?: FabricObject[];
-    currentTarget?: FabricObject | null;
-  };
+export interface TPointerEventInfo<E extends TPointerEvent = TPointerEvent>
+  extends TEvent<E> {
+  target?: FabricObject;
+  subTargets?: FabricObject[];
+  transform?: Transform | null;
+  /**
+   * @deprecated
+   * use viewportPoint instead.
+   * Kept for compatibility
+   */
+  pointer: Point;
+  /**
+   * @deprecated
+   * use scenePoint instead.
+   * Kept for compatibility
+   */
+  absolutePointer: Point;
+  scenePoint: Point;
+  viewportPoint: Point;
+}
 
-type SimpleEventHandler<T extends Event = TPointerEvent> = TEvent<T> & {
+interface SimpleEventHandler<T extends Event = TPointerEvent>
+  extends TEvent<T> {
   target?: FabricObject;
   subTargets: FabricObject[];
-};
+}
 
-type InEvent = {
+interface InEvent {
   previousTarget?: FabricObject;
-};
+}
 
-type OutEvent = {
+interface OutEvent {
   nextTarget?: FabricObject;
-};
+}
 
-export type DragEventData = TEvent<DragEvent> & {
+export interface DragEventData extends TEvent<DragEvent> {
   target?: FabricObject;
   subTargets?: FabricObject[];
   dragSource?: FabricObject;
   canDrop?: boolean;
   didDrop?: boolean;
   dropTarget?: FabricObject;
-};
+}
 
-export type DropEventData = DragEventData & { pointer: Point };
+export interface DropEventData extends DragEventData {
+  /**
+   * @deprecated
+   * use viewportPoint instead.
+   * Kept for compatibility
+   */
+  pointer: Point;
+  /**
+   * @deprecated
+   * use scenePoint instead.
+   * Kept for compatibility
+   */
+  absolutePointer: Point;
+  scenePoint: Point;
+  viewportPoint: Point;
+}
 
 interface DnDEvents {
   dragstart: TEventWithTarget<DragEvent>;
@@ -205,10 +231,17 @@ type TPointerEvents<Prefix extends string> = Record<
   `${Prefix}${
     | WithBeforeSuffix<'down'>
     | WithBeforeSuffix<'move'>
-    | WithBeforeSuffix<'up'>
     | 'dblclick'}`,
   TPointerEventInfo
 > &
+  Record<
+    `${Prefix}${WithBeforeSuffix<'up'>}`,
+    TPointerEventInfo & {
+      isClick: boolean;
+      currentTarget?: FabricObject;
+      currentSubTargets: FabricObject[];
+    }
+  > &
   Record<`${Prefix}wheel`, TPointerEventInfo<WheelEvent>> &
   Record<`${Prefix}over`, TPointerEventInfo & InEvent> &
   Record<`${Prefix}out`, TPointerEventInfo & OutEvent>;

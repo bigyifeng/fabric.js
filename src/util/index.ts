@@ -18,6 +18,13 @@ export {
 } from './misc/radiansDegreesConversion';
 export { rotatePoint } from './misc/rotatePoint';
 export * from './misc/projectStroke';
+export type {
+  TComposeMatrixArgs,
+  TQrDecomposeOut,
+  TRotateMatrixArgs,
+  TScaleMatrixArgs,
+  TTranslateMatrixArgs,
+} from './misc/matrix';
 export {
   transformPoint,
   invertTransform,
@@ -67,7 +74,6 @@ export { makeBoundingBoxFromPoints } from './misc/boundingBoxFromPoints';
 export {
   calcPlaneChangeMatrix,
   sendPointToPlane,
-  transformPointRelativeToCanvas,
   sendObjectToPlane,
 } from './misc/planeChange';
 export * as string from './lang_string';
